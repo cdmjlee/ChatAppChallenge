@@ -1,0 +1,88 @@
+<!DOCTYPE>
+<html>
+	<head>
+    	<meta charset="utf-8">
+    	<title>Chatbuilder</title>
+		<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    	<script src="http://chatbuilder.hackreactor.com/ChatBuilder.js"></script>
+	</head>          
+		<body>  
+        	<script> 
+			/*
+				Coding challenge done BY Jonathan Lee
+				6/29/14
+				Contact Me: (510)978-1859 / cdmjlee@gmail.com
+			*/
+			//delete the helper functions
+			delete Chat.display;
+			delete Chat.fetch;
+			delete Chat.send;
+			
+			//sets timer to call chatFetchAndDisplay every 3000 milliseconds
+			window.setInterval(chatFetchAndDisplay, 3000);
+			//chat send
+			/*
+				input = the text in the draft input.
+				
+			*/
+			
+			function chatSend()
+			{
+						var input = document.getElementById("draft").value;
+						//found on stack overstack to get username
+						var username = getQueryVariable('username');
+						//declare an empty object literal
+						var obj = {};
+						//set a property called text
+						obj.text = username + ': ' + input;
+						
+						//stringifys your object to be JSON specific
+						var text = JSON.stringify(obj);
+						
+						//this is a jquery function
+						
+						$.ajax({
+							url: 'https://api.parse.com/1/classes/chats',
+							type: 'POST',
+							data: text,
+							success: function() {
+							}
+						});
+			}
+
+			function chatFetchAndDisplay()
+			{
+				//clears the chat
+				$("#robochat").empty();
+				
+				var dat;
+				
+				$.ajax({ 
+					type: 'GET', 
+					url: 'https://api.parse.com/1/classes/chats', 
+					data: dat, 
+					success: function (dat) { 
+						for (var i = 0; i < dat.results.length; i++)
+						{
+							$("#robochat").append("<li>" + dat.results[i].text +"</li>");
+						}
+					}
+				});
+			}
+
+			function getQueryVariable(variable) {
+				var query = window.location.search.substring(1);
+				var vars = query.split('&');
+				for (var i = 0; i < vars.length; i++) {
+					var pair = vars[i].split('=');
+					if (decodeURIComponent(pair[0]) == variable) {
+						return decodeURIComponent(pair[1]);
+					}
+				}
+			}
+</script>
+   			<input id="draft" type="text"/>
+  			<button class="send" onclick="chatSend()"; >Send</button>
+  			<ul class="messages" id="robochat" ></ul>
+   	  	</body>
+</html>
